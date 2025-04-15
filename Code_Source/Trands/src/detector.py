@@ -1,5 +1,6 @@
 import pandas as pd
 from src.vehicle import Wall
+
 '''
 检测器类——可以检测检测路段某位断面流量和平均车速
 如果需要检测其他数据请继承，并重写以下方法：
@@ -23,6 +24,7 @@ from src.vehicle import Wall
 注： 一些数据可以通过给车辆对象添加字段来方便检测（如，换道次数）
 '''
 
+
 # 默认检测所有时间 所有空间
 class Detector:
     def __init__(self, start_time=0, end_time=float('inf'),
@@ -35,7 +37,7 @@ class Detector:
         self.end_time = end_time  # 检测器结束检测时间
         self.start_x = start_x  # 检测器开始检测位置
         self.end_x = end_x  # 检测器结束检测位置
-        self.is_circle_border = is_circle_border # 是否为周期边界条件
+        self.is_circle_border = is_circle_border  # 是否为周期边界条件
         # 记录 detect_times 次 车辆速度和 最终求平均车速
         self.vehicles_data = {'v_sum': [], 'detect_times': [], 'change_lane_times': []}  # 车辆检测数据
         self.detecing_vehicles_df = pd.DataFrame(self.vehicles_data)  # 正在检测车辆数据表
@@ -59,7 +61,8 @@ class Detector:
                 # 已在正在检测字典中，但不需要检测，即已完成检测
                 self.finish_detect_event(vehicle)
                 # 将检测数据归档到已检测车辆数据表中
-                self.completed_vehicles_df = self.completed_vehicles_df.append(self.detecing_vehicles_df.loc[vehicle.index, :])
+                self.completed_vehicles_df = self.completed_vehicles_df.append(
+                    self.detecing_vehicles_df.loc[vehicle.index, :])
                 self.detecing_vehicles_df.drop(labels=vehicle.index, inplace=True)
 
     # 数据处理方法 将检测器获得原始数据处理为特定格式
@@ -67,16 +70,16 @@ class Detector:
         out_dict = {}  # 数据处理返回结果字典
         # 计算各车平均车速
         self.completed_vehicles_df.loc[:, 'average_speed'] = (self.completed_vehicles_df.loc[:, 'v_sum'] /
-                                                          self.completed_vehicles_df.loc[:, 'detect_times'])
+                                                              self.completed_vehicles_df.loc[:, 'detect_times'])
         # 计算所有车辆平均车速的平均
         out_dict['average_speed'] = self.completed_vehicles_df.loc[:, 'average_speed'].mean()
         out_dict['flow'] = self.flow
         return out_dict
 
-
     '''
     如果要统计个性化数据  需要重写的方法（需要统计流量和平均车速需要执行超类方法）
     '''
+
     # 判断当前是否需要检测：是否到检测时间
     def need_detect(self, cur_time, vehicle):
         """

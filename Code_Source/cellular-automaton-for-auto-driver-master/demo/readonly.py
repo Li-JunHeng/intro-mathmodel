@@ -22,10 +22,13 @@ class test(object):
         return self.b
 
     @bb.setter
-    def bb(self,value):
+    def bb(self, value):
         self.b = value
+
+
 # 如果只有property， 无法进行初始化
 t = test()
 # t.a = 11
 
-print t.a
+print
+t.a

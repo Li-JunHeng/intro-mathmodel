@@ -8,18 +8,17 @@
 
 # Main.py
 
-#encoding=utf-8
+# encoding=utf-8
 # import pudb; pu.db
-import xlrd 
+import xlrd
 import xlwt
-import json
+
 fname = "../Resource/2017_MCM_Problem_C_Data2.xlsx"
 import logging
 from sympy import *
 from Handler import CellularHandler
-from Global import CARS_INFO, CELL_RATIO
-from matplotlib import pyplot as plt
-import numpy as np
+from Global import CARS_INFO
+
 logging.basicConfig(level=logging.INFO,
                     filename='log.log',
                     filemode='w')
@@ -27,24 +26,28 @@ logging.basicConfig(level=logging.INFO,
 bk = xlrd.open_workbook(fname)
 shxrange = range(bk.nsheets)
 try:
- sh = bk.sheet_by_name("parsed mile posts")
+    sh = bk.sheet_by_name("parsed mile posts")
 except:
- print "no sheet in %s named parsed mile posts" % fname
+    print
+    "no sheet in %s named parsed mile posts" % fname
 nrows = sh.nrows
-#获取列数
+# 获取列数
 ncols = sh.ncols
-print "nrows %d, ncols %d" % (nrows,ncols)
-#获取第一行第一列数据 
-ratios = [0,1]
+print
+"nrows %d, ncols %d" % (nrows, ncols)
+# 获取第一行第一列数据
+ratios = [0, 1]
 input_data = {}
 nrows = sh.nrows
 # calculate density from vehicle amount.
-avg_length = sum([a['length']*b for a,b in zip(CARS_INFO,ratios)])
-max_density = 1/avg_length
-avg_velocity = sum([a['max_velocity']*b for a,b in zip(CARS_INFO,ratios)])
-print "max_density : %s"%max_density
-print "avg velocity : %s"%avg_velocity
-for i in range(1,nrows):
+avg_length = sum([a['length'] * b for a, b in zip(CARS_INFO, ratios)])
+max_density = 1 / avg_length
+avg_velocity = sum([a['max_velocity'] * b for a, b in zip(CARS_INFO, ratios)])
+print
+"max_density : %s" % max_density
+print
+"avg velocity : %s" % avg_velocity
+for i in range(1, nrows):
     row_data = sh.row_values(i)
     peak_ratio = 0.08
     peak_hours = 3
@@ -52,8 +55,9 @@ for i in range(1,nrows):
     volume_per_hours = row_data[3] * peak_ratio / peak_hours / (row_data[5] + row_data[6]) * 1.5
 
     x = symbols('x')
-    c3 = [-5.45976747e-06,3.61579749e-03,-8.40823631e-01,7.32999243e+01,1.28547642e+01]
-    density_per_miles_list =solve(Eq(c3[0]*x**4+c3[1]*x**3+c3[2]*x**2+c3[3]*x**1+c3[4],volume_per_hours),x)
+    c3 = [-5.45976747e-06, 3.61579749e-03, -8.40823631e-01, 7.32999243e+01, 1.28547642e+01]
+    density_per_miles_list = solve(
+        Eq(c3[0] * x ** 4 + c3[1] * x ** 3 + c3[2] * x ** 2 + c3[3] * x ** 1 + c3[4], volume_per_hours), x)
     real_result = []
     for item in density_per_miles_list:
         try:
@@ -61,23 +65,27 @@ for i in range(1,nrows):
         except Exception as e:
             continue
         real_result.append(float_item)
-    print real_result
+    print
+    real_result
     density_per_miles = min(real_result)
     # density_per_miles = max([x for x in density_per_miles if x > 0])
     # density_per_miles = max(solve(Eq(x*avg_velocity*log(max_density/x),volume_per_hours),x))
     # density_per_miles = max(solve(Eq(avg_velocity*(x - (1/max_density)*x**2),volume_per_hours),x))
-    item = {'id':row_data[0],'startpost':row_data[1],'endpost':row_data[2],'density':density_per_miles,'path_number':direct_selected}
+    item = {'id': row_data[0], 'startpost': row_data[1], 'endpost': row_data[2], 'density': density_per_miles,
+            'path_number': direct_selected}
     if input_data.has_key(item['id']):
         # 不是第一个数据
         input_data[item['id']].append(item)
     else:
         # 是第一个数据
-        input_data[item[ 'id']] = [item]
-    print item
-    print "volume_per_hours : %s"%volume_per_hours
-cell_handler = CellularHandler(input_data,ratios)
-(vo,ve)=cell_handler.driver(5)
-cell_handler.plot_path_map(5,0)
+        input_data[item['id']] = [item]
+    print
+    item
+    print
+    "volume_per_hours : %s" % volume_per_hours
+cell_handler = CellularHandler(input_data, ratios)
+(vo, ve) = cell_handler.driver(5)
+cell_handler.plot_path_map(5, 0)
 # cell_handler.plot_all_path(5)
 
 # the folloing is to calclulate the realtion between density, velocity and volume

@@ -1,5 +1,6 @@
 import random
 from math import exp
+
 from src.vehicle_enum import Direction
 
 

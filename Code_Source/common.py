@@ -1,33 +1,42 @@
-import numpy as np
-import cv2
+import itertools as it
 import os
 from contextlib import contextmanager
-import itertools as it
 from functools import reduce
 
+import cv2
+import numpy as np
+
 image_extensions = ['.bmp', '.jpg', '.jpeg', '.png', '.tif', '.tiff', '.pbm', '.pgm', '.ppm']
+
 
 class Bunch(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
+
     def __str__(self):
         return str(self.__dict__)
+
 
 def splitfn(fn):
     path, fn = os.path.split(fn)
     name, ext = os.path.splitext(fn)
     return path, name, ext
 
+
 def anorm2(a):
-    return (a*a).sum(-1)
+    return (a * a).sum(-1)
+
+
 def anorm(a):
-    return np.sqrt( anorm2(a) )
+    return np.sqrt(anorm2(a))
+
 
 def homotrans(H, x, y):
-    xs = H[0, 0]*x + H[0, 1]*y + H[0, 2]
-    ys = H[1, 0]*x + H[1, 1]*y + H[1, 2]
-    s  = H[2, 0]*x + H[2, 1]*y + H[2, 2]
-    return xs/s, ys/s
+    xs = H[0, 0] * x + H[0, 1] * y + H[0, 2]
+    ys = H[1, 0] * x + H[1, 1] * y + H[1, 2]
+    s = H[2, 0] * x + H[2, 1] * y + H[2, 2]
+    return xs / s, ys / s
+
 
 def to_rect(a):
     a = np.ravel(a)
@@ -35,17 +44,18 @@ def to_rect(a):
         a = (0, 0, a[0], a[1])
     return np.array(a, np.float64).reshape(2, 2)
 
+
 def rect2rect_mtx(src, dst):
     src, dst = to_rect(src), to_rect(dst)
     cx, cy = (dst[1] - dst[0]) / (src[1] - src[0])
     tx, ty = dst[0] - src[0] * (cx, cy)
-    M = np.float64([[ cx,  0, tx],
-                    [  0, cy, ty],
-                    [  0,  0,  1]])
+    M = np.float64([[cx, 0, tx],
+                    [0, cy, ty],
+                    [0, 0, 1]])
     return M
 
 
-def lookat(eye, target, up = (0, 0, 1)):
+def lookat(eye, target, up=(0, 0, 1)):
     fwd = np.asarray(target, np.float64) - eye
     fwd /= anorm(fwd)
     right = np.cross(fwd, up)
@@ -55,18 +65,21 @@ def lookat(eye, target, up = (0, 0, 1)):
     tvec = -np.dot(R, eye)
     return R, tvec
 
+
 def mtx2rvec(R):
     w, u, vt = cv2.SVDecomp(R - np.eye(3))
-    p = vt[0] + u[:,0]*w[0]    # same as np.dot(R, vt[0])
+    p = vt[0] + u[:, 0] * w[0]  # same as np.dot(R, vt[0])
     c = np.dot(vt[0], p)
     s = np.dot(vt[1], p)
     axis = np.cross(vt[0], vt[1])
     return axis * np.arctan2(s, c)
 
+
 def draw_str(dst, xxx_todo_changeme, s):
     (x, y) = xxx_todo_changeme
-    cv2.putText(dst, s, (x+1, y+1), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), thickness = 2, lineType=cv2.CV_AA)
+    cv2.putText(dst, s, (x + 1, y + 1), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), thickness=2, lineType=cv2.CV_AA)
     cv2.putText(dst, s, (x, y), cv2.FONT_HERSHEY_PLAIN, 1.0, (255, 255, 255), lineType=cv2.CV_AA)
+
 
 class Sketcher:
     def __init__(self, windowname, dests, colors_func):
@@ -96,14 +109,15 @@ class Sketcher:
 
 
 # palette data from matplotlib/_cm.py
-_jet_data =   {'red':   ((0., 0, 0), (0.35, 0, 0), (0.66, 1, 1), (0.89,1, 1),
-                         (1, 0.5, 0.5)),
-               'green': ((0., 0, 0), (0.125,0, 0), (0.375,1, 1), (0.64,1, 1),
-                         (0.91,0,0), (1, 0, 0)),
-               'blue':  ((0., 0.5, 0.5), (0.11, 1, 1), (0.34, 1, 1), (0.65,0, 0),
-                         (1, 0, 0))}
+_jet_data = {'red': ((0., 0, 0), (0.35, 0, 0), (0.66, 1, 1), (0.89, 1, 1),
+                     (1, 0.5, 0.5)),
+             'green': ((0., 0, 0), (0.125, 0, 0), (0.375, 1, 1), (0.64, 1, 1),
+                       (0.91, 0, 0), (1, 0, 0)),
+             'blue': ((0., 0.5, 0.5), (0.11, 1, 1), (0.34, 1, 1), (0.65, 0, 0),
+                      (1, 0, 0))}
 
-cmap_data = { 'jet' : _jet_data }
+cmap_data = {'jet': _jet_data}
+
 
 def make_cmap(name, n=256):
     data = cmap_data[name]
@@ -114,17 +128,20 @@ def make_cmap(name, n=256):
         ch_data = data[ch_name]
         xp, yp = [], []
         for x, y1, y2 in ch_data:
-            xp += [x, x+eps]
+            xp += [x, x + eps]
             yp += [y1, y2]
         ch = np.interp(xs, xp, yp)
         channels.append(ch)
-    return np.uint8(np.array(channels).T*255)
+    return np.uint8(np.array(channels).T * 255)
+
 
 def nothing(*arg, **kw):
     pass
 
+
 def clock():
     return cv2.getTickCount() / cv2.getTickFrequency()
+
 
 @contextmanager
 def Timer(msg):
@@ -133,18 +150,21 @@ def Timer(msg):
     try:
         yield
     finally:
-        print("%.2f ms" % ((clock()-start)*1000))
+        print("%.2f ms" % ((clock() - start) * 1000))
+
 
 class StatValue:
-    def __init__(self, smooth_coef = 0.5):
+    def __init__(self, smooth_coef=0.5):
         self.value = None
         self.smooth_coef = smooth_coef
+
     def update(self, v):
         if self.value is None:
             self.value = v
         else:
             c = self.smooth_coef
-            self.value = c * self.value + (1.0-c) * v
+            self.value = c * self.value + (1.0 - c) * v
+
 
 class RectSelector:
     def __init__(self, win, callback):
@@ -153,19 +173,20 @@ class RectSelector:
         cv2.setMouseCallback(win, self.onmouse)
         self.drag_start = None
         self.drag_rect = None
-        self.boo=False
+        self.boo = False
+
     def onmouse(self, event, x, y, flags, param):
-        x, y = np.int16([x, y]) # BUG
+        x, y = np.int16([x, y])  # BUG
         if (self.boo):
             if event == cv2.EVENT_LBUTTONDOWN:
                 print("click2boo")
-                print(x,y)
+                print(x, y)
                 print(self.drag_start)
                 xo, yo = self.drag_start
                 x0, y0 = np.minimum([xo, yo], [x, y])
                 x1, y1 = np.maximum([xo, yo], [x, y])
                 self.drag_rect = None
-                if x1-x0 > 0 and y1-y0 > 0:
+                if x1 - x0 > 0 and y1 - y0 > 0:
                     self.drag_rect = (x0, y0, x1, y1)
                     print("got a rect")
                     rect = self.drag_rect
@@ -173,18 +194,20 @@ class RectSelector:
                     self.drag_rect = None
                     if rect:
                         self.callback(rect)
-                self.boo=False
+                self.boo = False
         elif event == cv2.EVENT_LBUTTONDOWN:
             print("click1")
             self.drag_start = (x, y)
             print(self.drag_start)
-            self.boo=True
+            self.boo = True
+
     def draw(self, vis):
         if not self.drag_rect:
             return False
         x0, y0, x1, y1 = self.drag_rect
         cv2.rectangle(vis, (x0, y0), (x1, y1), (0, 255, 0), 2)
         return True
+
     @property
     def dragging(self):
         return self.drag_rect is not None
@@ -194,6 +217,7 @@ def grouper(n, iterable, fillvalue=None):
     '''grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx'''
     args = [iter(iterable)] * n
     return it.izip_longest(fillvalue=fillvalue, *args)
+
 
 def mosaic(w, imgs):
     '''Make a grid from images.
@@ -208,14 +232,17 @@ def mosaic(w, imgs):
     rows = grouper(w, imgs, pad)
     return np.vstack(list(map(np.hstack, rows)))
 
+
 def getsize(img):
     h, w = img.shape[:2]
     return w, h
 
+
 def mdot(*args):
     return reduce(np.dot, args)
 
-def draw_keypoints(vis, keypoints, color = (0, 255, 255)):
+
+def draw_keypoints(vis, keypoints, color=(0, 255, 255)):
     for kp in keypoints:
-            x, y = kp.pt
-            cv2.circle(vis, (int(x), int(y)), 2, color)
+        x, y = kp.pt
+        cv2.circle(vis, (int(x), int(y)), 2, color)

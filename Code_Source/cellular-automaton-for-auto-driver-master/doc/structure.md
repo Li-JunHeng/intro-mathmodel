@@ -1,14 +1,15 @@
 ## 项目介绍
+
 ## 数据结构
+
 """
 车的基类
 """
 class BasicCar
-	velocity:当前行驶速度
-	length:长度
-	location:[x,y]
-	accelerate:加速度
-
+velocity:当前行驶速度
+length:长度
+location:[x,y]
+accelerate:加速度
 
 	def update_status():
 		"""
@@ -21,19 +22,16 @@ class BasicCar
 				- 右车道的
 		"""
 
-	
 """
 自动驾驶汽车类
 """
 class AutoCar
 
-
 """
 非自动驾驶汽车类
 """
 class NoAutoCar
-	type:类型
-
+type:类型
 
 """
 路线类，包含了一个公路的诸多段落
@@ -44,29 +42,26 @@ class Route
 公路段类，包含了两个方向的公路
 """
 class Road
-	road_length
-	increase_dir
-	decrease_dir
-
+road_length
+increase_dir
+decrease_dir
 
 """
 每一个方向的路为一个path，一个path有若干的车道
 """
 class Path
 
-
 """
 每个车道的单元
 """
 class PathUnit
 
-
 """
 自动机驱动器
 """
 class CellularHandler
-	car_amount
-	auto-car_rate
+car_amount
+auto-car_rate
 
 	def car_creator():
 		"""
@@ -92,8 +87,6 @@ class CellularHandler
 			记录这个过程的每次状态信息，用于绘图
 		"""
 
-
-
-
 ## 项目结构
+
 ## 主要函数的代码逻辑
