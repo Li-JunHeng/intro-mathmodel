@@ -82,7 +82,7 @@ class CellularHandler(object):
 		# 		car_type = multi_probility_test(self.car_acc_probility)
 		# 		single_car_info = CARS_INFO[car_type]
 		# 		max_vel = single_car_info['max_velocity']
-		# 		# [todo] 正太分布
+		# 		# [todo] 正态分布
 		# 		init_vel = random.randint(2, max_vel/3)
 		# 		# print "[car_creator]new car type is %s"%single_car_info['type']
 		# 		if single_car_info['type']==0:
