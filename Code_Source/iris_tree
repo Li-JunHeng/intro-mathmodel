@@ -1,0 +1,29 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname="Microsoft YaHei UI"] ;
+edge [fontname="Microsoft YaHei UI"] ;
+0 [label="petal width (cm) <= 0.8\ngini = 0.666\nsamples = 105\nvalue = [34, 37, 34]\nclass = sepal width (cm)", fillcolor="#f7fefa"] ;
+1 [label="gini = 0.0\nsamples = 34\nvalue = [34, 0, 0]\nclass = sepal length (cm)", fillcolor="#e58139"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="petal length (cm) <= 4.95\ngini = 0.499\nsamples = 71\nvalue = [0, 37, 34]\nclass = sepal width (cm)", fillcolor="#effdf5"] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label="petal width (cm) <= 1.65\ngini = 0.102\nsamples = 37\nvalue = [0, 35, 2]\nclass = sepal width (cm)", fillcolor="#44e688"] ;
+2 -> 3 ;
+4 [label="gini = 0.0\nsamples = 35\nvalue = [0, 35, 0]\nclass = sepal width (cm)", fillcolor="#39e581"] ;
+3 -> 4 ;
+5 [label="gini = 0.0\nsamples = 2\nvalue = [0, 0, 2]\nclass = petal length (cm)", fillcolor="#8139e5"] ;
+3 -> 5 ;
+6 [label="petal width (cm) <= 1.75\ngini = 0.111\nsamples = 34\nvalue = [0, 2, 32]\nclass = petal length (cm)", fillcolor="#8945e7"] ;
+2 -> 6 ;
+7 [label="petal width (cm) <= 1.55\ngini = 0.444\nsamples = 6\nvalue = [0, 2, 4]\nclass = petal length (cm)", fillcolor="#c09cf2"] ;
+6 -> 7 ;
+8 [label="gini = 0.0\nsamples = 3\nvalue = [0, 0, 3]\nclass = petal length (cm)", fillcolor="#8139e5"] ;
+7 -> 8 ;
+9 [label="petal length (cm) <= 5.45\ngini = 0.444\nsamples = 3\nvalue = [0, 2, 1]\nclass = sepal width (cm)", fillcolor="#9cf2c0"] ;
+7 -> 9 ;
+10 [label="gini = 0.0\nsamples = 2\nvalue = [0, 2, 0]\nclass = sepal width (cm)", fillcolor="#39e581"] ;
+9 -> 10 ;
+11 [label="gini = 0.0\nsamples = 1\nvalue = [0, 0, 1]\nclass = petal length (cm)", fillcolor="#8139e5"] ;
+9 -> 11 ;
+12 [label="gini = 0.0\nsamples = 28\nvalue = [0, 0, 28]\nclass = petal length (cm)", fillcolor="#8139e5"] ;
+6 -> 12 ;
+}
